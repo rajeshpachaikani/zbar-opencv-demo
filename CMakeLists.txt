@@ -4,8 +4,6 @@ project(opencv)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
 
 set(CMAKE_CXX_STANDARD 14)
-
-
 find_package (ZBar0 REQUIRED)
 find_package( OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
