@@ -1,7 +1,6 @@
 //Reference:https://www.learnopencv.com/opencv-qr-code-scanner-c-and-python/
 
 #include <iostream>
-#include <algorithm>
 #include <vector>
 #include <zbar.h>
 
@@ -27,10 +26,11 @@ void decodewithlocation(Mat &im, vector<decodedObject>&decodedObjects)
 
     // Create zbar scanner
     ImageScanner scanner;
-
+    //Clear decoded Object to keep only one QR code in memory at a time.
+    decodedObjects.clear();
     // Configure scanner
-    scanner.set_config(ZBAR_NONE, ZBAR_CFG_ENABLE, 0);
-    scanner.set_config(ZBAR_QRCODE, ZBAR_CFG_ENABLE, 1);
+    scanner.set_config(ZBAR_NONE, ZBAR_CFG_ENABLE, 1);
+//    scanner.set_config(ZBAR_QRCODE, ZBAR_CFG_ENABLE, 1);
 
     // Convert image to grayscale
     Mat imGray;
@@ -69,38 +69,15 @@ void decodewithlocation(Mat &im, vector<decodedObject>&decodedObjects)
 int main(int argc, char *argv[])
 {
 
-    // Read image
-//    string imagepath = argv[1];
-//    Mat im = imread(imagepath);
-
     vector<decodedObject> decodedObjects;
 
     VideoCapture *cam = new VideoCapture(0);
-    ImageScanner scanner;
-
-    scanner.set_config(ZBAR_NONE, ZBAR_CFG_ENABLE, 0);
-    scanner.set_config(ZBAR_QRCODE, ZBAR_CFG_ENABLE, 1);
-
-    Mat imGray;
-
-
-
-
-
 
     while(cam->isOpened()){
-        Mat image, clone;
+        Mat image;
         cam->read(image);
-        cvtColor(image, imGray,COLOR_BGR2GRAY);
-//        decodewithlocation(image, decodedObjects);
-        Image img(image.cols, image.rows, "Y800", (uchar *)imGray.data, image.cols * image.rows);
-
-        for(Image::SymbolIterator iterator = img.symbol_begin(); iterator!=iterator.end(); ++iterator){
-            for(int i = 0; i< iterator->get_location_size();i++){
-
-            }
-        }
-
+//        cvtColor(image, image,COLOR_BGR2GRAY);
+        decodewithlocation(image, decodedObjects);
 
         cout<<decodedObjects.size()<<endl;
         for (int i=0; i<decodedObjects.size(); i++){
@@ -116,12 +93,12 @@ int main(int argc, char *argv[])
             int n = hull.size();
             for(int j = 0; j < n; j++)
             {
-                line(clone, hull[j], hull[ (j+1) % n], Scalar(0,255,90), 3);
+                line(image, hull[j], hull[ (j+1) % n], Scalar(0,255,90), 3);
             }
-           // cout<<hull.size()<<endl;
+
         }
 
-        imshow("image", clone);
+        imshow("image", image);
 
 
         if(waitKeyEx(1)==99){
